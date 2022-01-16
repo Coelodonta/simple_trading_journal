@@ -29,5 +29,11 @@ It uses a bare-bones LAMP stack running on a local machine with no external depe
 - Use the command in populate_db.sql as a template to create additional accounts
 - Good to go
 
+# what it isn't
+- It does not execute trades, only tracks them like paper and pencil would
+- It does not cover Forex, futures or options, only equities
+- It does not provide any trade advice - that's the users job
+- It isn't complicated or difficult to use or install
+
 # a note about security
 There is none. This is a single-user application intended to run on a users personal machine as an alternative to text files and Excel spreadsheets. The assumption is that the user is no more likely or motivated to abuse this application than she is to corrupt her own text files or spreadsheets. With that in mind there are no user ids, logins, privileges etc. Everything is accessible within the constraints of the user's system privileges. Also, no particular care has been taken to make it hack-proof. Thus, if somebody wants to run it on a network it would be wise that at a minimum she adds some form of user management, takes a look at the various SQL statements for vulnerabilities, and removes the mysqldump commands.
