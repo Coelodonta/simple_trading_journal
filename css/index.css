@@ -1,0 +1,125 @@
+.body {
+	font-family: sans-serif;
+}
+
+.wrapper {
+	font-family: sans-serif;
+	min-height: 100%;
+	margin:  3px;
+	padding: 2px;
+}
+
+.header {
+	font-family: serif;
+	padding-bottom: 5px;
+	min-width: 100%;
+	background-color: #eeeef0;
+	text-align: center;
+
+}
+
+
+/* NAVBAR */
+.navbar {
+	padding-top: 3px;
+	padding-bottom: 10px;
+	padding-left: 20px;
+	background-color: #505050;
+	color:  #ffffff;
+}
+
+.navbar a {
+	text-decoration: none;
+	color: #ffffff;
+	margin: 10px;
+}
+
+.current_page {
+	background-color: #8080f0;
+}
+
+.tickers {
+	float: right;
+	padding-right: 100px;
+}
+
+.tickers input{
+	width: 350px;
+}
+
+
+.dats input{
+	width: 100px;
+}
+
+/* FILTERS */
+.filters {
+	min-width: 100%;
+	background-color: #d0d0d0;
+	float: left;
+	padding-top: 2px;
+}
+
+.filter {
+	width: 17%;
+	font-size: x-small;
+	float: left;
+	background-color: #d0d0d0;
+	border: 1px solid;
+	padding: 1px;
+	margin-right: 1px;
+}
+
+.filters textarea{
+	min-width: 60%;
+	max-width: 60%;
+	height:  200px;
+	background-color: white;
+}
+
+.filter_label{
+	float:  left;
+	padding-left: 2px;
+}
+
+.filter_selection{
+	float:  right;
+	padding-left: 2px;
+}
+
+.filter_selection option {
+	font-size: x-small;
+}
+
+.filter_selection select {
+	font-size: x-small;
+}
+
+
+.picks {
+	font-size:  small;
+}
+
+.picks table{
+	border:  1px solid;
+	width:  99%;
+}
+.picks input{
+	width: 75px;
+	font-size:  x-small;
+}
+.picks td {
+	text-align: left;
+	font-size:  x-small;
+}
+.picks th {
+	font-size:  x-small;
+}
+.picks textarea {
+	font-size:  x-small;
+}
+.picks select {
+	font-size:  x-small;
+}
+
+
