@@ -109,7 +109,6 @@ if($op=='statistics'){
 
 	// All orders open before DT.
 	$sql = "select count(*) as Cnt from Trade where Status=1 and DT<='$edt' $acct_str $side_str $type_str";
-	echo $sql;
 	$rows=$conn->query($sql);
 	$row=$rows->fetch_row();
 	echo "<tr><th>Open Orders at end of period</th><td>".$row[0]."</td><td/><td/></tr>";
@@ -157,24 +156,24 @@ if($op=='statistics'){
 	$sql = "select min(PL) as MinPL, max(PL) as MaxPL, min(PLDollar) as MinDL, max(PLDollar) as MaxDL from Trade where Status in (4,5) and DT>='$dt' and DT<='$edt' $acct_str $side_str $type_str";
 	$rows=$conn->query($sql);
 	$row=$rows->fetch_row();
-	echo "<tr><th>Worst trade profit % in the period</th><td>".round($row[0],2)."</td><td/><td/></tr>";
-	echo "<tr><th>Best trade profit % in the period</th><td>".round($row[1],2)."</td><td/><td/></tr>";
-	echo "<tr><th>Worst trade profit $ in the period</th><td>".round($row[2],2)."</td><td/><td/></tr>";
-	echo "<tr><th>Best trade profit $ in the period</th><td>".round($row[3],2)."</td><td/><td/></tr>";
+	echo "<tr><th>Worst trade profit % in the period</th><td>".round($row[0],2)."% </td><td/><td/></tr>";
+	echo "<tr><th>Best trade profit % in the period</th><td>".round($row[1],2)."% </td><td/><td/></tr>";
+	echo "<tr><th>Worst trade profit $ in the period</th><td> $".round($row[2],2)." </td><td/><td/></tr>";
+	echo "<tr><th>Best trade profit $ in the period</th><td> $".round($row[3],2)." </td><td/><td/></tr>";
 
 	$sql = "select avg(PL) as AvgPL, avg(PLDollar) as avgDL from Trade where Status in (4,5) and DT>='$dt' and DT<='$edt' $acct_str $side_str $type_str";
 	$rows=$conn->query($sql);
 	$row=$rows->fetch_row();
-	echo "<tr><th>Average trade profit % in the period</th><td>".round($row[0],2)."</td><td/><td/></tr>";
-	echo "<tr><th>Average trade profit $ in the period</th><td>".round($row[1],2)."</td><td/><td/></tr>";
+	echo "<tr><th>Average trade profit % in the period</th><td>".round($row[0],2)."% </td><td/><td/></tr>";
+	echo "<tr><th>Average trade profit $ in the period</th><td> $".round($row[1],2)." </td><td/><td/></tr>";
 
 
 	$sql = "select min(Qty*ActualEntryPrice) as MinSz, max(Qty*ActualEntryPrice) as MaxSz, avg(Qty*ActualEntryPrice) as AvgSz from Trade where Status in (4,5) and DT>='$dt' and DT<='$edt' $acct_str $side_str $type_str";
 	$rows=$conn->query($sql);
 	$row=$rows->fetch_row();
-	echo "<tr><th>Smallest trade size $ in the period</th><td>".round($row[0],2)."</td><td/><td/></tr>";
-	echo "<tr><th>Largest trade size $ in the period</th><td>".round($row[1],2)."</td><td/><td/></tr>";
-	echo "<tr><th>Average trade size $ in the period</th><td>".round($row[2],2)."</td><td/><td/></tr>";
+	echo "<tr><th>Smallest trade size $ in the period</th><td> $".round($row[0],2)." </td><td/><td/></tr>";
+	echo "<tr><th>Largest trade size $ in the period</th><td> $".round($row[1],2)." </td><td/><td/></tr>";
+	echo "<tr><th>Average trade size $ in the period</th><td> $".round($row[2],2)." </td><td/><td/></tr>";
 
 
 	$sql = "select min(Qty) as MinSz, max(Qty) as MaxSz, avg(Qty) as AvgSz from Trade where Status in (4,5) and DT>='$dt' and DT<='$edt' $acct_str $side_str $type_str";
@@ -185,6 +184,21 @@ if($op=='statistics'){
 	echo "<tr><th>Average trade size numbers of shares in the period</th><td>".round($row[2],2)."</td><td/><td/></tr>";
 
 
+	$sql = "select count(*) as Cnt from Trade where Status in (4,5) and PL>=0 and DT>='$dt' and DT<='$edt' $acct_str $side_str $type_str";
+	$rows=$conn->query($sql);
+	$row=$rows->fetch_row();
+	$winners = $row[0];
+
+	$sql = "select count(*) as Cnt from Trade where Status in (4,5) and PL<0 and DT>='$dt' and DT<='$edt' $acct_str $side_str $type_str";
+	$rows=$conn->query($sql);
+	$row=$rows->fetch_row();
+	$losers = $row[0];
+
+	if(($winners + $losers) > 0.00){
+		echo "<tr><th>Percentage winning trades in the period</th><td>".round(100*($winners/($winners+$losers)),2)."% </td><td/><td/></tr>";
+		echo "<tr><th>Number of winning trades in the period</th><td> $winners </td><td/><td/></tr>";
+		echo "<tr><th>Number of losing trades in the period</th><td> $losers </td><td/><td/></tr>";
+	}
 }
 ?>
 			</table>
