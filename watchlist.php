@@ -8,7 +8,8 @@ $conn = connect($host,$usr,$pwd,$db);
 
 $ticklist=array();
 $account=get_post_data('account','0');
-$dt=get_post_data('start_dt',date('Y-m-d', strtotime("-1 week")));
+//$dt=get_post_data('start_dt',date('Y-m-d', strtotime("-1 week")));
+$dt=get_post_data('start_dt',date('Y-m-d'));
 $edt=get_post_data('end_dt',date('Y-m-d'));
 $tickers=get_post_data('symbols','');
 $status_filter=get_post_data('status_filter','1');
@@ -22,9 +23,15 @@ if($op=="add"){
 elseif($op=="save") {
 	save_watch($conn);
 }
+elseif($op=="dismiss") {
+	one_click_dismiss($conn);
+}
+elseif($op=="dismiss_all") {
+	one_click_dismiss_all($conn);
+}
 
 // Build sql for the list
-$sql="select WatchId,AcctId,Ticker,CAST(DT as CHAR) as DT,CAST(DDT as CHAR) as DDT,Status,ImageLink,Publish,Idea 
+$sql="select WatchId,AcctId,Ticker,CAST(DT as CHAR) as DT,CAST(DDT as CHAR) as DDT,Status,ImageLink,Publish,Idea, Counter 
 from Watch where DT>='$dt' and DT<='$edt' ";
 if($account!=""){
 	$sql.=" and AcctId=$account";
@@ -96,7 +103,7 @@ $sql.=" order by DT $sort_filter, Ticker asc";
 $trades=list_watchlist($conn,$sql);
 
 if($trades->num_rows>0){
-	echo "<tr><th>Watch No</th><th>Ticker</th><th>Date <span style='font-size: xx-small;'>(yyyy-mm-dd)</span></th><th>Dismissed Date</th><th>Status</th><th>Idea</th><th>Image URL</th><th>Finviz</th><th>Yahoo</th><th>Action</th></tr>";
+	echo "<tr><th>Watch No</th><th>Ticker</th><th>Date <span style='font-size: xx-small;'>(yyyy-mm-dd)</span></th><th>Dismissed Date</th><th>Status</th><th>Idea</th><th>Count</th><th>Image URL</th><th>Finviz</th><th>Yahoo</th><th colspan='2'>Action</th></tr>";
 }
 
 $dark="";
@@ -111,7 +118,7 @@ foreach ($trades as $row) {
 	$img=$row['ImageLink'];
 	$idea=trim($row['Idea']);
 	$ddt=$row['DDT'];
-
+	$cnt=$row['Counter'];
 ?>
 				<tr>
 					<form action="" method="POST">
@@ -127,10 +134,20 @@ foreach ($trades as $row) {
 						<td <?=$dark?>><input type="text" name="dismiss_dt" value="<?=$ddt?>"></td>
 						<td <?=$dark?>><?=make_listbox_from_array('status',$watch_status_values,$status)?></td>
 						<td <?=$dark?>><textarea name="idea"><?=$idea?></textarea></td>
+						<td <?=$dark?>><input type="text" name="counter" value="<?=$cnt?>"></td>
 						<td <?=$dark?>><input type="text" name="image_link" value="<?=$img?>"></td>
 						<td <?=$dark?>> <a href="https://finviz.com/quote.ashx?t=<?=$ticker?>" target="<?=$ticker?>">https://finviz.com/quote.ashx?t=<?=$ticker?></a> </td>
 						<td <?=$dark?>> <a href="https://finance.yahoo.com/quote/<?=$ticker?>/chart" target="<?=$ticker?>">https://finance.yahoo.com/quote/<?=$ticker?>/chart</a> </td>
 						<td <?=$dark?>><button type='submit'>Save</button></td>
+					</form>
+					<form action="" method="POST">
+						<input type="hidden" name="start_dt" value="<?=$dt?>">
+						<input type="hidden" name="end_dt" value="<?=$edt?>">
+						<input type="hidden" name="op" value="dismiss">
+						<input type="hidden" name="account" value="<?=$account?>">
+						<input type="hidden" name="status_filter"  value="<?=$status_filter?>">
+						<input type="hidden" name="id" value="<?=$id?>">
+						<td <?=$dark?>><button type='submit'>Dismiss</button></td>
 					</form>
 				</tr>
 
@@ -158,6 +175,17 @@ if($account!=""){
 						<td <?=$dark?>><input type="text" name="DT" value="<?=date('Y-m-d')?>"></td>
 						<td <?=$dark?>><textarea name="idea"></textarea></td>
 						<td <?=$dark?>><button type='submit'>Add</button></td>
+					</form>
+				</tr>
+				<tr style="width: 50%;">
+					<form action="" method="POST">
+						<input type="hidden" name="start_dt" value="<?=$dt?>">
+						<input type="hidden" name="end_dt" value="<?=$edt?>">
+						<input type="hidden" name="op" value="dismiss_all">
+						<input type="hidden" name="status_filter"  value="1">
+						<input type="hidden" name="account" value="<?=$account?>">
+						<td <?=$dark?> colspan='3'>Dismiss all ticker older than <?=$dt?> for this account</td>
+						<td <?=$dark?>><button type='submit'>Dismiss all</button></td>
 					</form>
 				</tr>
 <?php
@@ -248,4 +276,25 @@ function save_watch($conn){
 	$stmt->execute();
 	$stmt->close();
 }
+
+function one_click_dismiss($conn){
+	$id=get_post_data('id','-1');
+
+	// TO DO: Convert to a proper prepared statement with bound parameters
+	$sql="update Watch set DDT=CURDATE(), Status=2 where WatchId=$id";
+	$stmt=$conn->prepare($sql);
+	$stmt->execute();
+	$stmt->close();
+}
+
+function one_click_dismiss_all($conn){
+	$dt=get_post_data('start_dt',date('Y-m-d'));
+	$account=get_post_data('account','0');
+	// TO DO: Convert to a proper prepared statement with bound parameters
+	$sql="update Watch set DDT=CURDATE(), Status=2 where AcctId=$account and Status=1 and DT<'$dt'";
+	$stmt=$conn->prepare($sql);
+	$stmt->execute();
+	$stmt->close();
+}
+
 ?>
